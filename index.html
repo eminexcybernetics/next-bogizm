@@ -3,151 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Next Bogizm</title>
+    <title>Next Bogizm | Infected Titan TV Man</title>
     <style>
-        /* Обнуляем отступы */
+        /* Базовые сбросы */
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-
-        body {
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             background-color: #000000;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #ffffff;
-            font-family: 'Arial Black', 'Impact', sans-serif; /* Жирный пробивной шрифт */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* Контейнер для фоновой картинки с плавным переходом */
-        .background-container {
+        /* ТВОЙ МЕТОД: Контейнер для оригинальной картинки 4K */
+        .leak-background {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 56.25vw; /* Пропорция 16:9 для идеального отображения картинки */
-            max-height: 50vh; /* Ограничиваем, чтобы на компьютерах картинка не занимала весь экран */
-            z-index: -1;
-            background: url('https://i.ibb.co/zhLYpqkC/2026-10-25-233527.png') no-repeat top center;
+            width: 100%;
+            height: 65vh;
+            background-image: url('https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/con2fig.sys'); 
             background-size: cover;
+            background-position: center top;
+            z-index: 1;
         }
 
-        /* Накладываем черный градиент отдельным слоем поверх картинки */
-        .background-container::after {
-            content: '';
-            position: absolute;
+        /* ЧЕРНЫЙ ГРАДИЕНТ НА МЕСТЕ (Перекрывает картинку сверху) */
+        .gradient-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 101%; /* Чуть больше, чтобы перекрыть стыки */
-            background: linear-gradient(to bottom, transparent 0%, #000000 90%);
+            height: 100%;
+            /* Плавный глухой черный цвет, начинающийся ровно там, где надо */
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0, 0, 0, 0.3) 35%, 
+                rgba(0, 0, 0, 0.9) 55%, 
+                #000000 68%
+            );
+            z-index: 2; /* Строго поверх картинки */
+            pointer-events: none;
         }
 
-        /* Главный контент строго по центру */
-        .content {
+        /* Основной content-container */
+        .content-container {
+            position: relative;
+            z-index: 3; /* Поверх градиента */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 100vh;
+            padding-bottom: 8vh;
             text-align: center;
-            max-width: 90%;
-            width: 800px;
-            padding: 20px;
+        }
+
+        /* Заголовок "Next Bogizm" */
+        h1 {
+            font-size: 3.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin: 0 0 5px 0;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Желтый переливающийся текст */
+        .character-tag {
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 35px;
+            background: linear-gradient(90deg, #ffe066, #f59e0b, #fef08a, #ffe066);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShine 4s linear infinite;
+            filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
+        }
+
+        /* Контейнер таймера */
+        .countdown-wrapper {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+        }
+
+        /* БЛОК С ЭФФЕКТОМ БЕГАЮЩЕЙ БЕЛОЙ ЗМЕЙКИ */
+        .time-block {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background: rgba(10, 10, 12, 0.9);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .time-block:hover {
+            transform: scale(1.05);
+        }
+
+        /* Вращающаяся белая змейка на рамке */
+        .time-block::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(transparent, transparent, transparent, #ffffff);
+            animation: snakeRotate 4s linear infinite;
+        }
+
+        /* Внутренняя плашка */
+        .time-block-inner {
+            position: absolute;
+            inset: 3px; /* Толщина светящейся линии */
+            background: #0f0f12;
+            border-radius: 13px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 2;
         }
 
-        /* Верхний текст */
-        .sub-text {
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            color: #aaaaaa;
-            font-weight: normal;
-            font-family: sans-serif;
-        }
-
-        /* Блок таймера */
-        .timer {
-            font-family: monospace; /* Цифры не прыгают */
+        .time-number {
             font-size: 3rem;
-            font-weight: bold;
-            color: #ff3333; /* Красный цвет таймера */
-            margin-bottom: 40px;
-            text-shadow: 0px 0px 15px rgba(255, 51, 51, 0.6);
+            font-weight: 800;
+            font-family: monospace;
+            color: #ffffff;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* Главный жирный текст */
-        .main-report {
-            font-size: 4.5rem; /* Очень крупный и жирный размер */
-            line-height: 1.1;
+        .time-label {
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: -1px;
-            text-shadow: 0px 5px 20px rgba(0, 0, 0, 0.9);
-            word-wrap: break-word;
+            color: #88888e;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
-        /* Адаптивность под мобильные экраны */
-        @media (max-width: 768px) {
-            .main-report {
-                font-size: 2.8rem;
-            }
-            .sub-text {
-                font-size: 1.3rem;
-            }
-            .timer {
-                font-size: 2.2rem;
-            }
+        /* АНИМАЦИИ */
+        @keyframes textShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        @keyframes snakeRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            .leak-background { height: 50vh; }
+            h1 { font-size: 2.2rem; }
+            .character-tag { font-size: 1.1rem; margin-bottom: 25px; }
+            .countdown-wrapper { gap: 12px; }
+            .time-block { width: 90px; height: 90px; border-radius: 12px; }
+            .time-block-inner { inset: 2px; border-radius: 10px; }
+            .time-number { font-size: 2.1rem; }
+            .time-label { font-size: 0.55rem; margin-top: 4px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Задний фон -->
-    <div class="background-container"></div>
+    <!-- 1. Контейнер для твоей оригинальной картинки -->
+    <div class="leak-background"></div>
 
-    <!-- Контент -->
-    <div class="content">
-        <div class="sub-text">NEXT BOGIZM:</div>
-        
-        <div class="timer" id="countdown">00h 00m 00s</div>
-        
-        <h1 class="main-report">Infected Titan Tv Man</h1>
+    <!-- 2. Черный градиент поверх низа картинки (СТРОГО НА МЕСТЕ) -->
+    <div class="gradient-overlay"></div>
+
+    <!-- 3. Контент сайта -->
+    <div class="content-container">
+        <h1>Next Bogizm</h1>
+        <div class="character-tag">Infected Titan TV Man</div>
+
+        <div class="countdown-wrapper">
+            <div class="time-block">
+                <div class="time-block-inner">
+                    <div class="time-number" id="hours">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+            </div>
+            <div class="time-block">
+                <div class="time-block-inner">
+                    <div class="time-number" id="minutes">00</div>
+                    <div class="time-label">Minutes</div>
+                </div>
+            </div>
+            <div class="time-block">
+                <div class="time-block-inner">
+                    <div class="time-number" id="seconds">00</div>
+                    <div class="time-label">Seconds</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Скрипт таймера -->
     <script>
-        // Целевое время: сегодня в 20:15 по Владивостоку (+10:00)
-        const targetDate = new Date("2026-10-27T20:15:00+10:00").getTime();
-
+        // АВТОМАТИЧЕСКИЙ ОТСЧЕТ ДО 20:15 (Владивосток)
         function updateTimer() {
-            const now = new Date().getTime();
-            const difference = targetDate - now;
+            const now = new Date();
+            const targetDate = new Date();
+            targetDate.setHours(20, 15, 0, 0);
 
-            if (difference < 0) {
-                document.getElementById("countdown").innerHTML = "OUT NOW";
-                document.getElementById("countdown").style.color = "#00ff00"; /* Зеленый при релизе */
-                document.getElementById("countdown").style.textShadow = "0px 0px 15px rgba(0, 255, 0, 0.6)";
-                clearInterval(timerInterval);
-                return;
+            if (now > targetDate) {
+                targetDate.setDate(targetDate.getDate() + 1);
             }
 
-            const hours = Math.floor((difference / (1000 * 60 * 60)));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            const distance = targetDate - now;
 
-            const displayHours = hours < 10 ? "0" + hours : hours;
-            const displayMinutes = minutes < 10 ? "0" + minutes : minutes;
-            const displaySeconds = seconds < 10 ? "0" + seconds : seconds;
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            document.getElementById("countdown").innerHTML = 
-                `${displayHours}h ${displayMinutes}m ${displaySeconds}s`;
+            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
         }
 
-        const timerInterval = setInterval(updateTimer, 1000);
+        setInterval(updateTimer, 1000);
         updateTimer();
     </script>
 
