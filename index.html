@@ -146,12 +146,65 @@
             filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
         }
 
+        /* Область таймера: сюда же накладывается надпись Done. после окончания отсчёта */
+        .timer-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
         /* Контейнер таймера */
         .countdown-wrapper {
             display: flex;
             gap: 25px;
             justify-content: center;
             animation: fadeUp 1.2s ease-out 1.1s both;
+        }
+
+        /* ✅ ПОСЛЕ ОКОНЧАНИЯ ОТСЧЁТА */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to   { opacity: 0; visibility: hidden; }
+        }
+
+        /* Отсчёт закончился на глазах у посетителя: таймер плавно исчезает */
+        .countdown-wrapper.finished {
+            animation: fadeOut 0.8s ease forwards;
+        }
+
+        /* Посетитель зашёл уже после окончания: таймера нет сразу, без анимации */
+        .countdown-wrapper.finished-static {
+            animation: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .countdown-wrapper.finished .time-block::before,
+        .countdown-wrapper.finished-static .time-block::before {
+            animation-play-state: paused;
+        }
+
+        /* Надпись Done. — стоит ровно на месте таймера, поэтому вёрстка не прыгает */
+        .done-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            font-size: clamp(2.6rem, 11vw, 4.5rem); /* адаптивный размер */
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: clamp(2px, 1vw, 6px);
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .done-text.show {
+            visibility: visible;
+            animation: fadeUp 1.2s ease-out var(--done-delay, 1.1s) both;
         }
 
         /* БЛОК С ЭФФЕКТОМ БЕГАЮЩЕЙ БЕЛОЙ ЗМЕЙКИ */
@@ -286,6 +339,10 @@
                 overflow-wrap: anywhere;
             }
 
+            .timer-area {
+                width: 100%;
+            }
+
             .countdown-wrapper {
                 width: 100%;
                 max-width: 360px;
@@ -347,25 +404,30 @@
         <h1>Next Bogizm</h1>
         <div class="character-tag">Infected Titan TV Man</div>
 
-        <div class="countdown-wrapper">
-            <div class="time-block">
-                <div class="time-block-inner">
-                    <div class="time-number" id="hours">00</div>
-                    <div class="time-label">Hours</div>
+        <div class="timer-area">
+            <div class="countdown-wrapper" id="countdown">
+                <div class="time-block">
+                    <div class="time-block-inner">
+                        <div class="time-number" id="hours">00</div>
+                        <div class="time-label">Hours</div>
+                    </div>
+                </div>
+                <div class="time-block">
+                    <div class="time-block-inner">
+                        <div class="time-number" id="minutes">00</div>
+                        <div class="time-label">Minutes</div>
+                    </div>
+                </div>
+                <div class="time-block">
+                    <div class="time-block-inner">
+                        <div class="time-number" id="seconds">00</div>
+                        <div class="time-label">Seconds</div>
+                    </div>
                 </div>
             </div>
-            <div class="time-block">
-                <div class="time-block-inner">
-                    <div class="time-number" id="minutes">00</div>
-                    <div class="time-label">Minutes</div>
-                </div>
-            </div>
-            <div class="time-block">
-                <div class="time-block-inner">
-                    <div class="time-number" id="seconds">00</div>
-                    <div class="time-label">Seconds</div>
-                </div>
-            </div>
+
+            <!-- Надпись после окончания отсчёта -->
+            <div class="done-text" id="done" aria-hidden="true">Done.</div>
         </div>
     </div>
 
@@ -418,33 +480,63 @@
         })();
     </script>
 
-    <!-- ПОЛНОСТЬЮ ДОПИСАННЫЙ И РАБОЧИЙ СКРИПТ ТАЙМЕРА -->
+    <!-- 🕒 ТАЙМЕР: один раз, до фиксированного момента, одинаковый для всех посетителей -->
     <script>
-        function updateTimer() {
-            const now = new Date();
-            const targetDate = new Date();
-            
-            // Настройка времени отсчета (по умолчанию на сегодня до 20:15)
-            targetDate.setHours(20, 15, 0, 0);
+        // 21:55 по Владивостоку (UTC+10), 27 октября 2026.
+        // Смещение +10:00 зашито прямо в строку, поэтому момент окончания один и тот же
+        // для всех посетителей в любой точке мира. Чтобы сменить время — меняй дату и часы,
+        // а "+10:00" оставь.
+        const TARGET_TIME = new Date('2026-10-27T21:55:00+10:00').getTime();
 
-            if (now > targetDate) {
-                targetDate.setDate(targetDate.getDate() + 1);
+        const countdownEl = document.getElementById('countdown');
+        const doneEl = document.getElementById('done');
+
+        let timerId = null;
+        let finished = false;
+        let wasRunning = false; // true, если посетитель застал отсчёт «вживую»
+
+        function finishCountdown() {
+            if (finished) return;
+            finished = true;
+            clearInterval(timerId);
+
+            if (wasRunning) {
+                // Отсчёт закончился на глазах у посетителя: таймер плавно исчезает, потом появляется Done.
+                countdownEl.classList.add('finished');
+                doneEl.style.setProperty('--done-delay', '0.6s');
+            } else {
+                // Посетитель зашёл уже после окончания: сразу показываем Done.
+                countdownEl.classList.add('finished-static');
             }
 
-            const distance = targetDate - now;
+            doneEl.classList.add('show');
+            doneEl.removeAttribute('aria-hidden');
+        }
 
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        function updateTimer() {
+            const distance = TARGET_TIME - Date.now();
+
+            if (distance <= 0) {
+                finishCountdown();
+                return;
+            }
+            wasRunning = true;
+
+            const totalSeconds = Math.floor(distance / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
 
             document.getElementById('hours').innerText = String(hours).padStart(2, '0');
             document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
             document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
         }
 
-        // Запуск и обновление каждую секунду
+        // Первый запуск сразу, затем обновление (если отсчёт ещё не закончился)
         updateTimer();
-        setInterval(updateTimer, 1000);
+        if (!finished) {
+            timerId = setInterval(updateTimer, 250);
+        }
     </script>
 </body>
 </html>
