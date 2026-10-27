@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Next Bogizm | Infected Titan TV Man</title>
     <style>
+        /* Картинка задаётся ОДИН раз — в скрипте внизу (BG_URL).
+           Пока она не загрузилась, здесь стоит none. */
+        :root {
+            --bg-image: none;
+        }
+
         /* Базовые сбросы */
         * {
             box-sizing: border-box;
@@ -21,34 +27,78 @@
             overflow-x: hidden;
         }
 
-        /* КОНТЕЙНЕР ДЛЯ КАРТИНКИ: На компах 65vh, на мобилках растянется на весь экран */
+        /* 🖥️ ПК: Картинка и градиент живут в одном контейнере без стыков и швов */
         .leak-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 65vh;
-            background-image: url('https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/con2fig.sys'); 
+            height: 65vh; /* На ПК занимает 65% высоты экрана */
+            background-image: 
+                linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.9) 85%, #000000 100%), 
+                var(--bg-image); 
             background-size: cover;
-            background-position: center top;
+            background-position: center center;
+            background-repeat: no-repeat;
             z-index: 1;
+
+            /* ✨ FADE IN КАРТИНКИ: невидима, пока не загрузится.
+               Класс .loaded добавляется скриптом после загрузки и декодирования картинки.
+               Длительность плавного появления — 1.8s (меняй здесь). */
+            opacity: 0;
+            transition: opacity 1.8s ease;
         }
 
-        /* УЛЬТИМАТИВНЫЙ ГРАДИЕНТ БЕЗ СТЫКОВ */
-        .gradient-overlay {
+        .leak-background.loaded {
+            opacity: 1;
+        }
+
+        /* ⏳ LOADER: надпись, пока грузится картинка.
+           Стоит по центру зоны картинки, плавно появляется (fade in), пульсирует,
+           а когда картинка готова — плавно исчезает (fade out) и уступает ей место. */
+        .loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, 
-                transparent 0%, 
-                rgba(0, 0, 0, 0.2) 40%, 
-                rgba(0, 0, 0, 0.8) 60%, 
-                #000000 80%
-            );
+            height: 65vh; /* та же высота, что у картинки на ПК */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 2;
             pointer-events: none;
+            opacity: 1;
+            /* Длительность fade out — 0.9s. visibility убирает блок полностью после исчезновения */
+            transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            padding: 0 16px;
+            text-align: center;
+            /* Адаптивный шрифт: растёт с шириной экрана, но не меньше и не больше заданных пределов */
+            font-size: clamp(1.05rem, 5vw, 1.9rem);
+            letter-spacing: clamp(2px, 1vw, 6px);
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #e8e8ec;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.35);
+            /* Сначала fade in за 1s, затем бесконечная мягкая пульсация */
+            animation: loaderIn 1s ease-out both, loaderPulse 2s ease-in-out 1s infinite;
+        }
+
+        @keyframes loaderIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.4; }
         }
 
         /* Основной контент поверх всего */
@@ -64,6 +114,12 @@
             text-align: center;
         }
 
+        /* ✨ FADE IN ТЕКСТА: плавное появление снизу вверх */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
         /* Заголовок "Next Bogizm" */
         h1 {
             font-size: 3.5rem;
@@ -72,6 +128,7 @@
             margin: 0 0 5px 0;
             color: #ffffff;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            animation: fadeUp 1.2s ease-out 0.3s both; /* длительность, задержка */
         }
 
         /* Желтый переливающийся текст */
@@ -85,7 +142,7 @@
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: textShine 4s linear infinite;
+            animation: fadeUp 1.2s ease-out 0.7s both, textShine 4s linear infinite;
             filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
         }
 
@@ -94,6 +151,7 @@
             display: flex;
             gap: 25px;
             justify-content: center;
+            animation: fadeUp 1.2s ease-out 1.1s both;
         }
 
         /* БЛОК С ЭФФЕКТОМ БЕГАЮЩЕЙ БЕЛОЙ ЗМЕЙКИ */
@@ -167,72 +225,124 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 📱 АВТОНОМНЫЙ ФИКС ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
+        /* 📱 МОБИЛКИ */
         @media (max-width: 768px) {
-            .leak-background {
-                height: 100vh; /* Картинка теперь железно на весь экран мобилки */
-                background-position: center 15%; /* Сдвигаем чуть пониже, чтобы лицо Титана было идеально по центру экрана */
+            :root {
+                /* Высота картинки на мобилке: меняй это значение, чтобы уменьшить/увеличить персонажа.
+                   Например, 65svh — меньше, 85svh — крупнее.
+                   Под неё автоматически подстраивается и градиент, и положение надписи Loading. */
+                --mobile-image-height: 77svh;
             }
 
-            .gradient-overlay {
-                /* На мобилках делаем более глубокую заливку снизу вверх, чтобы убрать любые швы */
-                background: linear-gradient(to bottom, 
-                    rgba(0, 0, 0, 0.1) 0%, 
-                    rgba(0, 0, 0, 0.4) 35%, 
-                    rgba(0, 0, 0, 0.85) 60%, 
-                    #000000 85%
-                );
+            .leak-background {
+                height: 100vh;
+                height: 100svh;
+
+                background-color: #000000;
+
+                /* Градиент той же высоты, что и картинка (+2px запаса от шва),
+                   внизу — чистый чёрный, поэтому нижний край картинки не виден. */
+                background-size: 100% calc(var(--mobile-image-height) + 2px), auto var(--mobile-image-height);
+                background-position: center top, center top;
+                background-repeat: no-repeat;
+                background-image:
+                    linear-gradient(to bottom,
+                        transparent 0%,
+                        rgba(0, 0, 0, 0.25) 35%,
+                        rgba(0, 0, 0, 0.6) 60%,
+                        rgba(0, 0, 0, 0.9) 85%,
+                        #000000 100%),
+                    var(--bg-image);
+            }
+
+            .loader {
+                /* Надпись по центру зоны картинки */
+                height: var(--mobile-image-height);
             }
 
             .content-container {
-                padding-bottom: 6vh;
+                /* Не даём заголовку уехать за край на низких экранах */
+                min-height: 100vh;
+                min-height: 100svh;
+                justify-content: flex-end;
+                padding: 24px 12px max(28px, 6svh);
+                gap: 0;
             }
 
-            h1 { 
-                font-size: 2.4rem; 
-                letter-spacing: 2px;
+            h1 {
+                max-width: 100%;
+                font-size: clamp(1.65rem, 7.2vw, 2.4rem);
+                line-height: 1.12;
+                letter-spacing: clamp(1px, 0.55vw, 2px);
+                overflow-wrap: anywhere;
             }
 
-            .character-tag { 
-                font-size: 1.1rem; 
-                margin-bottom: 30px; 
+            .character-tag {
+                max-width: 100%;
+                font-size: clamp(0.75rem, 3.6vw, 1.1rem);
+                line-height: 1.3;
+                letter-spacing: clamp(0.5px, 0.5vw, 2px);
+                margin: 0 0 clamp(20px, 5vh, 30px);
+                overflow-wrap: anywhere;
             }
 
-            .countdown-wrapper { 
-                gap: 12px; 
+            .countdown-wrapper {
+                width: 100%;
+                max-width: 360px;
+                gap: clamp(7px, 2.5vw, 12px);
+                justify-content: center;
             }
 
-            .time-block { 
-                width: 95px; 
-                height: 95px; 
-                border-radius: 12px; 
+            .time-block {
+                flex: 1 1 0;
+                min-width: 0;
+                width: auto;
+                max-width: 95px;
+                height: auto;
+                aspect-ratio: 1;
+                border-radius: 12px;
             }
 
             .time-block-inner { 
-                inset: 2px; /* Чуть тоньше змейка на мобилке, чтобы выглядело аккуратно */
+                inset: 2px; 
                 border-radius: 10px; 
             }
 
-            .time-number { 
-                font-size: 2.2rem; 
+            .time-label {
+                font-size: clamp(0.48rem, 2.1vw, 0.55rem);
+                margin-top: 4px;
+                letter-spacing: 0.5px;
+                text-align: center;
             }
 
-            .time-label { 
-                font-size: 0.55rem; 
-                margin-top: 4px; 
+            .time-number {
+                font-size: clamp(1.7rem, 8vw, 2.2rem);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .content-container {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .countdown-wrapper {
+                gap: 7px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. Картинка -->
+    <!-- ЗДЕСЬ ОБЪЕДИНЕНЫ КАРТИНКА И ГРАДИЕНТ -->
     <div class="leak-background"></div>
 
-    <!-- 2. Градиент -->
-    <div class="gradient-overlay"></div>
+    <!-- ⏳ Надпись, пока грузится картинка -->
+    <div class="loader" role="status" aria-live="polite">
+        <span class="loader-text">Loading Bogizm...</span>
+    </div>
 
-    <!-- 3. Контент -->
+    <!-- Основной контент -->
     <div class="content-container">
         <h1>Next Bogizm</h1>
         <div class="character-tag">Infected Titan TV Man</div>
@@ -259,11 +369,62 @@
         </div>
     </div>
 
+    <!-- ✨ ЗАГРУЗКА КАРТИНКИ: надпись Loading исчезает, картинка плавно появляется -->
     <script>
-        // АВТОМАТИЧЕСКИЙ ОТСЧЕТ ДО 20:15 (Владивосток)
+        const BG_URL = 'https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/con2fig.sys';
+
+        // Минимальное время показа надписи Loading (мс).
+        // Нужно, чтобы при быстрой загрузке (например, из кэша) она не мелькала на долю секунды.
+        // Поставь 0, если хочешь, чтобы она пропадала сразу, как только картинка готова.
+        const MIN_LOADER_MS = 1000;
+
+        (function () {
+            const bg = document.querySelector('.leak-background');
+            const loader = document.querySelector('.loader');
+            const startedAt = performance.now();
+
+            // Плавно убираем надпись и (если картинка загрузилась) плавно показываем картинку
+            function reveal(showImage) {
+                const wait = Math.max(0, MIN_LOADER_MS - (performance.now() - startedAt));
+                setTimeout(function () {
+                    loader.classList.add('hidden');
+                    if (showImage) {
+                        requestAnimationFrame(function () {
+                            bg.classList.add('loaded');
+                        });
+                    }
+                }, wait);
+            }
+
+            const img = new Image();
+
+            img.onload = function () {
+                // Картинка скачана — подставляем её в фон
+                document.documentElement.style.setProperty('--bg-image', "url('" + BG_URL + "')");
+
+                // Ждём, пока браузер её декодирует, и только потом запускаем fade in
+                const decoded = img.decode ? img.decode() : Promise.resolve();
+                decoded.catch(function () {}).then(function () {
+                    reveal(true);
+                });
+            };
+
+            // Если картинка не загрузилась — не оставляем надпись висеть вечно
+            img.onerror = function () {
+                reveal(false);
+            };
+
+            img.src = BG_URL;
+        })();
+    </script>
+
+    <!-- ПОЛНОСТЬЮ ДОПИСАННЫЙ И РАБОЧИЙ СКРИПТ ТАЙМЕРА -->
+    <script>
         function updateTimer() {
             const now = new Date();
             const targetDate = new Date();
+            
+            // Настройка времени отсчета (по умолчанию на сегодня до 20:15)
             targetDate.setHours(20, 15, 0, 0);
 
             if (now > targetDate) {
@@ -276,14 +437,14 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
-            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
-            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
         }
 
-        setInterval(updateTimer, 1000);
+        // Запуск и обновление каждую секунду
         updateTimer();
+        setInterval(updateTimer, 1000);
     </script>
-
 </body>
 </html>
