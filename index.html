@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Next Bogizm | Infected Titan TV Man</title>
+    <title>Next Bogizm | 77.3 Episode Poster</title>
     <style>
         /* Картинка задаётся ОДИН раз — в скрипте внизу (BG_URL).
            Пока она не загрузилась, здесь стоит none. */
@@ -131,19 +131,19 @@
             animation: fadeUp 1.2s ease-out 0.3s both; /* длительность, задержка */
         }
 
-        /* Желтый переливающийся текст */
+        /* Фиолетовый переливающийся текст */
         .character-tag {
             font-size: 1.4rem;
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 2px;
             margin-bottom: 35px;
-            background: linear-gradient(90deg, #ffe066, #f59e0b, #fef08a, #ffe066);
+            background: linear-gradient(90deg, #c084fc, #8b5cf6, #d8b4fe, #a855f7, #c084fc);
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: fadeUp 1.2s ease-out 0.7s both, textShine 4s linear infinite;
-            filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
+            filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.55));
         }
 
         /* Область таймера: сюда же накладывается надпись Done. после окончания отсчёта */
@@ -402,10 +402,16 @@
     <!-- Основной контент -->
     <div class="content-container">
         <h1>Next Bogizm</h1>
-        <div class="character-tag">Infected Titan TV Man</div>
+        <div class="character-tag">77.3 Episode Poster</div>
 
         <div class="timer-area">
             <div class="countdown-wrapper" id="countdown">
+                <div class="time-block">
+                    <div class="time-block-inner">
+                        <div class="time-number" id="days">00</div>
+                        <div class="time-label">Days</div>
+                    </div>
+                </div>
                 <div class="time-block">
                     <div class="time-block-inner">
                         <div class="time-number" id="hours">00</div>
@@ -433,7 +439,7 @@
 
     <!-- ✨ ЗАГРУЗКА КАРТИНКИ: надпись Loading исчезает, картинка плавно появляется -->
     <script>
-        const BG_URL = 'https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/con2fig.sys';
+        const BG_URL = 'https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/config2.sys';
 
         // Минимальное время показа надписи Loading (мс).
         // Нужно, чтобы при быстрой загрузке (например, из кэша) она не мелькала на долю секунды.
@@ -482,11 +488,11 @@
 
     <!-- 🕒 ТАЙМЕР: один раз, до фиксированного момента, одинаковый для всех посетителей -->
     <script>
-        // 21:55 по Владивостоку (UTC+10), 27 октября 2026.
+        // 18 ноября 2026, 00:00 по Владивостоку (UTC+10).
         // Смещение +10:00 зашито прямо в строку, поэтому момент окончания один и тот же
-        // для всех посетителей в любой точке мира. Чтобы сменить время — меняй дату и часы,
-        // а "+10:00" оставь.
-        const TARGET_TIME = new Date('2026-10-27T21:55:00+10:00').getTime();
+        // для всех посетителей в любой точке мира. Чтобы сменить дату или время — меняй
+        // цифры в строке (ГГГГ-ММ-ДДTЧЧ:ММ:СС), а "+10:00" оставь.
+        const TARGET_TIME = new Date('2026-11-18T00:00:00+10:00').getTime();
 
         const countdownEl = document.getElementById('countdown');
         const doneEl = document.getElementById('done');
@@ -523,10 +529,12 @@
             wasRunning = true;
 
             const totalSeconds = Math.floor(distance / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
             const minutes = Math.floor((totalSeconds % 3600) / 60);
             const seconds = totalSeconds % 60;
 
+            document.getElementById('days').innerText = String(days).padStart(2, '0');
             document.getElementById('hours').innerText = String(hours).padStart(2, '0');
             document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
             document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
