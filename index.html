@@ -21,41 +21,40 @@
             overflow-x: hidden;
         }
 
-        /* ТВОЙ МЕТОД: Контейнер для оригинальной картинки 4K */
+        /* КОНТЕЙНЕР ДЛЯ КАРТИНКИ: На компах 65vh, на мобилках растянется на весь экран */
         .leak-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 65vh;
-            background-image: url('https://github.com/eminexcybernetics/next-bogizm/raw/refs/heads/main/con2fig.sys'); 
+            background-image: url('config.sys'); 
             background-size: cover;
             background-position: center top;
             z-index: 1;
         }
 
-        /* ЧЕРНЫЙ ГРАДИЕНТ НА МЕСТЕ (Перекрывает картинку сверху) */
+        /* УЛЬТИМАТИВНЫЙ ГРАДИЕНТ БЕЗ СТЫКОВ */
         .gradient-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Плавный глухой черный цвет, начинающийся ровно там, где надо */
             background: linear-gradient(to bottom, 
                 transparent 0%, 
-                rgba(0, 0, 0, 0.3) 35%, 
-                rgba(0, 0, 0, 0.9) 55%, 
-                #000000 68%
+                rgba(0, 0, 0, 0.2) 40%, 
+                rgba(0, 0, 0, 0.8) 60%, 
+                #000000 80%
             );
-            z-index: 2; /* Строго поверх картинки */
+            z-index: 2;
             pointer-events: none;
         }
 
-        /* Основной content-container */
+        /* Основной контент поверх всего */
         .content-container {
             position: relative;
-            z-index: 3; /* Поверх градиента */
+            z-index: 3;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -129,7 +128,7 @@
         /* Внутренняя плашка */
         .time-block-inner {
             position: absolute;
-            inset: 3px; /* Толщина светящейся линии */
+            inset: 3px;
             background: #0f0f12;
             border-radius: 13px;
             display: flex;
@@ -168,28 +167,72 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Мобильная адаптация */
-        @media (max-width: 600px) {
-            .leak-background { height: 50vh; }
-            h1 { font-size: 2.2rem; }
-            .character-tag { font-size: 1.1rem; margin-bottom: 25px; }
-            .countdown-wrapper { gap: 12px; }
-            .time-block { width: 90px; height: 90px; border-radius: 12px; }
-            .time-block-inner { inset: 2px; border-radius: 10px; }
-            .time-number { font-size: 2.1rem; }
-            .time-label { font-size: 0.55rem; margin-top: 4px; }
+        /* 📱 АВТОНОМНЫЙ ФИКС ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
+        @media (max-width: 768px) {
+            .leak-background {
+                height: 100vh; /* Картинка теперь железно на весь экран мобилки */
+                background-position: center 15%; /* Сдвигаем чуть пониже, чтобы лицо Титана было идеально по центру экрана */
+            }
+
+            .gradient-overlay {
+                /* На мобилках делаем более глубокую заливку снизу вверх, чтобы убрать любые швы */
+                background: linear-gradient(to bottom, 
+                    rgba(0, 0, 0, 0.1) 0%, 
+                    rgba(0, 0, 0, 0.4) 35%, 
+                    rgba(0, 0, 0, 0.85) 60%, 
+                    #000000 85%
+                );
+            }
+
+            .content-container {
+                padding-bottom: 6vh;
+            }
+
+            h1 { 
+                font-size: 2.4rem; 
+                letter-spacing: 2px;
+            }
+
+            .character-tag { 
+                font-size: 1.1rem; 
+                margin-bottom: 30px; 
+            }
+
+            .countdown-wrapper { 
+                gap: 12px; 
+            }
+
+            .time-block { 
+                width: 95px; 
+                height: 95px; 
+                border-radius: 12px; 
+            }
+
+            .time-block-inner { 
+                inset: 2px; /* Чуть тоньше змейка на мобилке, чтобы выглядело аккуратно */
+                border-radius: 10px; 
+            }
+
+            .time-number { 
+                font-size: 2.2rem; 
+            }
+
+            .time-label { 
+                font-size: 0.55rem; 
+                margin-top: 4px; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. Контейнер для твоей оригинальной картинки -->
+    <!-- 1. Картинка -->
     <div class="leak-background"></div>
 
-    <!-- 2. Черный градиент поверх низа картинки (СТРОГО НА МЕСТЕ) -->
+    <!-- 2. Градиент -->
     <div class="gradient-overlay"></div>
 
-    <!-- 3. Контент сайта -->
+    <!-- 3. Контент -->
     <div class="content-container">
         <h1>Next Bogizm</h1>
         <div class="character-tag">Infected Titan TV Man</div>
