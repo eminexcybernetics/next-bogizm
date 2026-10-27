@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Bogizm</title>
+    <style>
+        /* Обнуляем отступы */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial Black', 'Impact', sans-serif; /* Жирный пробивной шрифт */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Контейнер для фоновой картинки с плавным переходом */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 56.25vw; /* Пропорция 16:9 для идеального отображения картинки */
+            max-height: 50vh; /* Ограничиваем, чтобы на компьютерах картинка не занимала весь экран */
+            z-index: -1;
+            background: url('https://i.ibb.co/zhLYpqkC/2026-10-25-233527.png') no-repeat top center;
+            background-size: cover;
+        }
+
+        /* Накладываем черный градиент отдельным слоем поверх картинки */
+        .background-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 101%; /* Чуть больше, чтобы перекрыть стыки */
+            background: linear-gradient(to bottom, transparent 0%, #000000 90%);
+        }
+
+        /* Главный контент строго по центру */
+        .content {
+            text-align: center;
+            max-width: 90%;
+            width: 800px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Верхний текст */
+        .sub-text {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            color: #aaaaaa;
+            font-weight: normal;
+            font-family: sans-serif;
+        }
+
+        /* Блок таймера */
+        .timer {
+            font-family: monospace; /* Цифры не прыгают */
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff3333; /* Красный цвет таймера */
+            margin-bottom: 40px;
+            text-shadow: 0px 0px 15px rgba(255, 51, 51, 0.6);
+        }
+
+        /* Главный жирный текст */
+        .main-report {
+            font-size: 4.5rem; /* Очень крупный и жирный размер */
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            text-shadow: 0px 5px 20px rgba(0, 0, 0, 0.9);
+            word-wrap: break-word;
+        }
+
+        /* Адаптивность под мобильные экраны */
+        @media (max-width: 768px) {
+            .main-report {
+                font-size: 2.8rem;
+            }
+            .sub-text {
+                font-size: 1.3rem;
+            }
+            .timer {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Задний фон -->
+    <div class="background-container"></div>
+
+    <!-- Контент -->
+    <div class="content">
+        <div class="sub-text">NEXT BOGIZM:</div>
+        
+        <div class="timer" id="countdown">00h 00m 00s</div>
+        
+        <h1 class="main-report">Infected Titan Tv Man</h1>
+    </div>
+
+    <!-- Скрипт таймера -->
+    <script>
+        // Целевое время: сегодня в 20:15 по Владивостоку (+10:00)
+        const targetDate = new Date("2026-10-27T20:15:00+10:00").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            if (difference < 0) {
+                document.getElementById("countdown").innerHTML = "OUT NOW";
+                document.getElementById("countdown").style.color = "#00ff00"; /* Зеленый при релизе */
+                document.getElementById("countdown").style.textShadow = "0px 0px 15px rgba(0, 255, 0, 0.6)";
+                clearInterval(timerInterval);
+                return;
+            }
+
+            const hours = Math.floor((difference / (1000 * 60 * 60)));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            const displayHours = hours < 10 ? "0" + hours : hours;
+            const displayMinutes = minutes < 10 ? "0" + minutes : minutes;
+            const displaySeconds = seconds < 10 ? "0" + seconds : seconds;
+
+            document.getElementById("countdown").innerHTML = 
+                `${displayHours}h ${displayMinutes}m ${displaySeconds}s`;
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+
+</body>
+</html>
